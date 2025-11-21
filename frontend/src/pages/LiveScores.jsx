@@ -1,133 +1,136 @@
-import { Trophy, ExternalLink, Clock, Tv } from 'lucide-react'
+import { Trophy, ExternalLink, Clock, Tv, RefreshCw } from 'lucide-react'
+import { formatDistanceToNow } from 'date-fns'
+import { useQuery } from 'react-query'
+import axios from 'axios'
+import { useState, useEffect } from 'react'
 
-// Mock live scores data - In production, this would come from a sports API
-const liveScores = [
-    {
-        id: 1,
-        sport: 'Cricket',
-        league: 'IPL 2024',
-        status: 'LIVE',
-        team1: {
-            name: 'Mumbai Indians',
-            short: 'MI',
-            score: '185/4',
-            overs: '18.3'
-        },
-        team2: {
-            name: 'Chennai Super Kings',
-            short: 'CSK',
-            score: '142/6',
-            overs: '15.0'
-        },
-        venue: 'Wankhede Stadium, Mumbai',
-        detailsUrl: 'https://www.espncricinfo.com',
-        isLive: true
-    },
-    {
-        id: 2,
-        sport: 'Football',
-        league: 'Premier League',
-        status: 'LIVE',
-        team1: {
-            name: 'Manchester United',
-            short: 'MUN',
-            score: '2'
-        },
-        team2: {
-            name: 'Liverpool',
-            short: 'LIV',
-            score: '1'
-        },
-        time: "67'",
-        venue: 'Old Trafford',
-        detailsUrl: 'https://www.premierleague.com',
-        isLive: true
-    },
-    {
-        id: 3,
-        sport: 'Cricket',
-        league: 'Test Match',
-        status: 'Day 2',
-        team1: {
-            name: 'India',
-            short: 'IND',
-            score: '345 & 89/2',
-            overs: '25.0'
-        },
-        team2: {
-            name: 'Australia',
-            short: 'AUS',
-            score: '287'
-        },
-        venue: 'MCG, Melbourne',
-        detailsUrl: 'https://www.espncricinfo.com',
-        isLive: false
-    },
-    {
-        id: 4,
-        sport: 'Football',
-        league: 'La Liga',
-        status: 'HT',
-        team1: {
-            name: 'Real Madrid',
-            short: 'RMA',
-            score: '1'
-        },
-        team2: {
-            name: 'Barcelona',
-            short: 'BAR',
-            score: '0'
-        },
-        venue: 'Santiago Bernabéu',
-        detailsUrl: 'https://www.laliga.com',
-        isLive: false
-    },
-    {
-        id: 5,
-        sport: 'Tennis',
-        league: 'Australian Open',
-        status: 'LIVE',
-        team1: {
-            name: 'Novak Djokovic',
-            short: 'DJO',
-            score: '6-4, 3-2'
-        },
-        team2: {
-            name: 'Carlos Alcaraz',
-            short: 'ALC',
-            score: '4-6, 2-3'
-        },
-        venue: 'Rod Laver Arena',
-        detailsUrl: 'https://ausopen.com',
-        isLive: true
-    },
-    {
-        id: 6,
-        sport: 'Basketball',
-        league: 'NBA',
-        status: 'Q3',
-        team1: {
-            name: 'LA Lakers',
-            short: 'LAL',
-            score: '78'
-        },
-        team2: {
-            name: 'Golden State Warriors',
-            short: 'GSW',
-            score: '82'
-        },
-        time: '5:23',
-        venue: 'Crypto.com Arena',
-        detailsUrl: 'https://www.nba.com',
-        isLive: true
+// Fetch live scores from backend API
+const fetchLiveScores = async () => {
+    try {
+        // Try to fetch real live scores first
+        const { data } = await axios.get('/api/v1/sports/live-scores')
+        if (data && data.length > 0) {
+            return data
+        }
+        // Fallback to demo endpoint if no live matches
+        const { data: demoData } = await axios.get('/api/v1/sports/live-scores/demo')
+        return demoData
+    } catch (error) {
+        console.error('Error fetching live scores:', error)
+        // Return demo data on error
+        const { data } = await axios.get('/api/v1/sports/live-scores/demo')
+        return data
     }
+}
+venue: 'Wankhede Stadium, Mumbai',
+    detailsUrl: 'https://www.espncricinfo.com',
+        isLive: true
+    },
+{
+    id: 2,
+        sport: 'Football',
+            league: 'Premier League',
+                status: 'LIVE',
+                    team1: {
+        name: 'Manchester United',
+            short: 'MUN',
+                score: '2'
+    },
+    team2: {
+        name: 'Liverpool',
+            short: 'LIV',
+                score: '1'
+    },
+    time: "67'",
+        venue: 'Old Trafford',
+            detailsUrl: 'https://www.premierleague.com',
+                isLive: true
+},
+{
+    id: 3,
+        sport: 'Cricket',
+            league: 'Test Match',
+                status: 'Day 2',
+                    team1: {
+        name: 'India',
+            short: 'IND',
+                score: '345 & 89/2',
+                    overs: '25.0'
+    },
+    team2: {
+        name: 'Australia',
+            short: 'AUS',
+                score: '287'
+    },
+    venue: 'MCG, Melbourne',
+        detailsUrl: 'https://www.espncricinfo.com',
+            isLive: false
+},
+{
+    id: 4,
+        sport: 'Football',
+            league: 'La Liga',
+                status: 'HT',
+                    team1: {
+        name: 'Real Madrid',
+            short: 'RMA',
+                score: '1'
+    },
+    team2: {
+        name: 'Barcelona',
+            short: 'BAR',
+                score: '0'
+    },
+    venue: 'Santiago Bernabéu',
+        detailsUrl: 'https://www.laliga.com',
+            isLive: false
+},
+{
+    id: 5,
+        sport: 'Tennis',
+            league: 'Australian Open',
+                status: 'LIVE',
+                    team1: {
+        name: 'Novak Djokovic',
+            short: 'DJO',
+                score: '6-4, 3-2'
+    },
+    team2: {
+        name: 'Carlos Alcaraz',
+            short: 'ALC',
+                score: '4-6, 2-3'
+    },
+    venue: 'Rod Laver Arena',
+        detailsUrl: 'https://ausopen.com',
+            isLive: true
+},
+{
+    id: 6,
+        sport: 'Basketball',
+            league: 'NBA',
+                status: 'Q3',
+                    team1: {
+        name: 'LA Lakers',
+            short: 'LAL',
+                score: '78'
+    },
+    team2: {
+        name: 'Golden State Warriors',
+            short: 'GSW',
+                score: '82'
+    },
+    time: '5:23',
+        venue: 'Crypto.com Arena',
+            detailsUrl: 'https://www.nba.com',
+                isLive: true
+}
 ];
 
 function ScoreCard({ match }) {
     return (
         <div className={`group relative bg-white dark:bg-[#1a1a1a] border-2 rounded-xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${match.isLive
-                ? 'border-red-500 dark:border-red-500'
-                : 'border-gray-200 dark:border-[#404040]'
+            ? 'border-red-500 dark:border-red-500'
+            : 'border-gray-200 dark:border-[#404040]'
             }`}>
             {/* Live Indicator */}
             {match.isLive && (
@@ -148,8 +151,8 @@ function ScoreCard({ match }) {
                         <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{match.league}</p>
                     </div>
                     <span className={`px-3 py-1 rounded-full text-xs font-semibold ${match.isLive
-                            ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400'
-                            : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'
+                        ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400'
+                        : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'
                         }`}>
                         {match.status}
                     </span>
@@ -232,64 +235,134 @@ function ScoreCard({ match }) {
 }
 
 export default function LiveScores() {
-    const liveMatches = liveScores.filter(match => match.isLive);
-    const otherMatches = liveScores.filter(match => !match.isLive);
+    const [autoRefresh, setAutoRefresh] = useState(true)
+
+    // Fetch live scores with auto-refresh every 30 seconds
+    const { data: liveScores, isLoading, error, refetch } = useQuery(
+        'liveScores',
+        fetchLiveScores,
+        {
+            refetchInterval: autoRefresh ? 30000 : false, // Refresh every 30 seconds
+            refetchIntervalInBackground: true,
+        }
+    )
+
+    const liveMatches = liveScores?.filter(match => match.isLive) || []
+    const otherMatches = liveScores?.filter(match => !match.isLive) || []
+
+    if (error) {
+        return (
+            <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a0a] flex items-center justify-center">
+                <div className="text-center">
+                    <p className="text-red-500 text-lg mb-2">Error loading live scores</p>
+                    <p className="text-gray-500 dark:text-gray-400">Please try again later</p>
+                </div>
+            </div>
+        )
+    }
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a0a] transition-colors duration-200">
             {/* Header */}
             <div className="bg-gradient-to-r from-red-600 to-orange-600 text-white py-12">
                 <div className="max-w-7xl mx-auto px-4">
-                    <div className="flex items-center gap-3 mb-3">
-                        <Trophy size={32} />
-                        <h1 className="text-4xl font-bold">Live Sports Scores</h1>
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <div className="flex items-center gap-3 mb-3">
+                                <Trophy size={32} />
+                                <h1 className="text-4xl font-bold">Live Sports Scores</h1>
+                            </div>
+                            <p className="text-red-100">
+                                Real-time scores from major sporting events • Updates every 30 seconds
+                            </p>
+                        </div>
+
+                        {/* Refresh Controls */}
+                        <div className="flex items-center gap-4">
+                            <button
+                                onClick={() => refetch()}
+                                className="flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg transition-colors backdrop-blur-sm border border-white/30"
+                                disabled={isLoading}
+                            >
+                                <RefreshCw size={18} className={isLoading ? 'animate-spin' : ''} />
+                                <span className="font-medium">Refresh</span>
+                            </button>
+
+                            <label className="flex items-center gap-2 cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    checked={autoRefresh}
+                                    onChange={(e) => setAutoRefresh(e.target.checked)}
+                                    className="w-4 h-4 rounded"
+                                />
+                                <span className="text-sm font-medium">Auto-refresh</span>
+                            </label>
+                        </div>
                     </div>
-                    <p className="text-red-100">
-                        Real-time scores from major sporting events around the world
-                    </p>
                 </div>
             </div>
 
             {/* Main Content */}
             <main className="max-w-7xl mx-auto px-4 py-8">
-                {/* Live Matches Section */}
-                {liveMatches.length > 0 && (
-                    <div className="mb-12">
-                        <div className="flex items-center gap-2 mb-6">
-                            <div className="w-3 h-3 bg-red-600 rounded-full animate-pulse"></div>
-                            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                                Live Now ({liveMatches.length})
-                            </h2>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {liveMatches.map(match => (
-                                <ScoreCard key={match.id} match={match} />
-                            ))}
+                {isLoading ? (
+                    <div className="flex items-center justify-center py-20">
+                        <div className="text-center">
+                            <RefreshCw size={48} className="animate-spin text-blue-600 mx-auto mb-4" />
+                            <p className="text-gray-600 dark:text-gray-400">Loading live scores...</p>
                         </div>
                     </div>
-                )}
+                ) : (
+                    <>
+                        {/* Live Matches Section */}
+                        {liveMatches.length > 0 ? (
+                            <div className="mb-12">
+                                <div className="flex items-center gap-2 mb-6">
+                                    <div className="w-3 h-3 bg-red-600 rounded-full animate-pulse"></div>
+                                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                                        Live Now ({liveMatches.length})
+                                    </h2>
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                    {liveMatches.map(match => (
+                                        <ScoreCard key={match.id} match={match} />
+                                    ))}
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="mb-12 p-12 bg-white dark:bg-[#1a1a1a] rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-700 text-center">
+                                <Trophy size={48} className="text-gray-400 mx-auto mb-4" />
+                                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                                    No Live Matches Right Now
+                                </h3>
+                                <p className="text-gray-500 dark:text-gray-400">
+                                    Check back soon for live sporting events
+                                </p>
+                            </div>
+                        )}
 
-                {/* Other Matches Section */}
-                {otherMatches.length > 0 && (
-                    <div>
-                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-                            Recent & Upcoming
-                        </h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {otherMatches.map(match => (
-                                <ScoreCard key={match.id} match={match} />
-                            ))}
+                        {/* Other Matches Section */}
+                        {otherMatches.length > 0 && (
+                            <div>
+                                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+                                    Recent & Upcoming
+                                </h2>
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                    {otherMatches.map(match => (
+                                        <ScoreCard key={match.id} match={match} />
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Info Note */}
+                        <div className="mt-12 p-6 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl">
+                            <p className="text-sm text-gray-700 dark:text-gray-300">
+                                <strong>Note:</strong> Scores update automatically every 30 seconds. Click "View Full Details" on any match card to get comprehensive coverage,
+                                live commentary, statistics, and more on the official sports websites.
+                            </p>
                         </div>
-                    </div>
+                    </>
                 )}
-
-                {/* Info Note */}
-                <div className="mt-12 p-6 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl">
-                    <p className="text-sm text-gray-700 dark:text-gray-300">
-                        <strong>Note:</strong> Click "View Full Details" on any match card to get comprehensive coverage,
-                        live commentary, statistics, and more on the official sports websites.
-                    </p>
-                </div>
             </main>
         </div>
     );
