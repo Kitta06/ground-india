@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from 'react-query'
 import Navbar from './components/Navbar'
 import Home from './pages/Home'
 import Sources from './pages/Sources'
+import LiveScores from './pages/LiveScores'
 
 import { AuthProvider } from './context/AuthContext'
 import { ThemeProvider } from './context/ThemeContext'
@@ -23,6 +24,7 @@ function App() {
                                 <Routes>
                                     <Route path="/" element={<Home />} />
                                     <Route path="/sources" element={<Sources />} />
+                                    <Route path="/live-scores" element={<LiveScores />} />
                                     <Route path="/login" element={<Login />} />
                                     <Route path="/signup" element={<Signup />} />
                                 </Routes>
