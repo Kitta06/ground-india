@@ -4,6 +4,7 @@ from app.core.config import settings
 from app.db.session import async_session
 from app.crud import create_article, get_sources
 from app.schemas import ArticleCreate
+from app.bias_analyzer import calculate_bias_score, get_bias_label
 import feedparser
 from datetime import datetime
 from time import mktime
@@ -68,6 +69,9 @@ async def fetch_feed(url: str, source_id: int):
                 # Categorize the article
                 category = categorize_article(entry.title, summary)
                 
+                # Calculate bias score
+                bias_score = calculate_bias_score(entry.title, summary)
+                
                 article = ArticleCreate(
                     title=entry.title,
                     summary=summary,
@@ -75,12 +79,14 @@ async def fetch_feed(url: str, source_id: int):
                     published_at=published_at,
                     source_id=source_id,
                     category=category,
-                    image_url=image_url
+                    image_url=image_url,
+                    bias_score=bias_score
                 )
                 
                 try:
                     await create_article(session, article)
-                    print(f"Saved [{category}]: {entry.title}")
+                    bias_label = get_bias_label(bias_score)
+                    print(f"Saved [{category}] [{bias_label}]: {entry.title}")
                 except Exception as e:
                     # Skip duplicates silently
                     await session.rollback()

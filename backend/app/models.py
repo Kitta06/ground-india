@@ -22,6 +22,7 @@ class ArticleBase(SQLModel):
     published_at: datetime = Field(default_factory=datetime.utcnow)
     image_url: Optional[str] = None
     category: Optional[str] = Field(default="General", index=True)
+    bias_score: Optional[float] = Field(default=0.0)  # -100 (left) to +100 (right)
     source_id: Optional[int] = Field(default=None, foreign_key="source.id")
 
 class Article(ArticleBase, table=True):
