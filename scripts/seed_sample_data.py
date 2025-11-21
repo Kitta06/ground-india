@@ -122,6 +122,42 @@ async def seed_data():
                 "feed_url": "https://timesofindia.indiatimes.com/rssfeeds/1081479906.cms",
                 "bias_rating": 0.0,
                 "reliability_score": 70.0
+            },
+            # Global Technology Sources
+            {
+                "name": "TechCrunch",
+                "url": "https://techcrunch.com",
+                "feed_url": "https://techcrunch.com/feed/",
+                "bias_rating": 0.0,
+                "reliability_score": 85.0
+            },
+            {
+                "name": "The Verge",
+                "url": "https://www.theverge.com",
+                "feed_url": "https://www.theverge.com/rss/index.xml",
+                "bias_rating": -0.5,
+                "reliability_score": 82.0
+            },
+            {
+                "name": "Ars Technica",
+                "url": "https://arstechnica.com",
+                "feed_url": "https://feeds.arstechnica.com/arstechnica/index",
+                "bias_rating": 0.0,
+                "reliability_score": 88.0
+            },
+            {
+                "name": "Wired",
+                "url": "https://www.wired.com",
+                "feed_url": "https://www.wired.com/feed/rss",
+                "bias_rating": -0.5,
+                "reliability_score": 83.0
+            },
+            {
+                "name": "MIT Technology Review",
+                "url": "https://www.technologyreview.com",
+                "feed_url": "https://www.technologyreview.com/feed/",
+                "bias_rating": 0.0,
+                "reliability_score": 90.0
             }
         ]
 
