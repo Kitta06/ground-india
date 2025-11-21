@@ -5,6 +5,7 @@ import Hero from '../components/Hero'
 import CategoryNav from '../components/CategoryNav'
 import ArticleCard from '../components/ArticleCard'
 import ArticleSkeleton from '../components/ArticleSkeleton'
+import SportsHighlights from '../components/SportsHighlights'
 
 const fetchArticles = async () => {
     const { data } = await axios.get('/api/v1/articles/')
@@ -50,12 +51,17 @@ export default function Home() {
 
             {/* Main Content */}
             <main className="max-w-7xl mx-auto px-4 py-8">
+                {/* Sports Highlights - Only show in Sports category */}
+                {activeCategory === 'Sports' && articles && (
+                    <SportsHighlights articles={articles} />
+                )}
+
                 {/* Section Header */}
                 <div className="mb-6">
-                    <h2 className="text-2xl font-bold text-white">
-                        {activeCategory === 'All' ? 'Latest Headlines' : activeCategory}
+                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                        {activeCategory === 'All' ? 'Latest Headlines' : activeCategory === 'Sports' ? 'All Sports News' : activeCategory}
                     </h2>
-                    <p className="text-gray-500 mt-1">
+                    <p className="text-gray-500 dark:text-gray-400 mt-1">
                         {filteredArticles?.length || 0} articles
                     </p>
                 </div>
@@ -78,7 +84,7 @@ export default function Home() {
                         ))
                     ) : (
                         <div className="col-span-full text-center py-12">
-                            <p className="text-gray-500">No articles found in this category</p>
+                            <p className="text-gray-500 dark:text-gray-400">No articles found in this category</p>
                         </div>
                     )}
                 </div>
