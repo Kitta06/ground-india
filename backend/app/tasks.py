@@ -17,26 +17,72 @@ celery_app.conf.beat_schedule = {
     },
 }
 
+def categorize_article(title: str, summary: str = "") -> str:
+    """Categorize article based on keywords in title and summary"""
+    text = (title + " " + summary).lower()
+    
+    # Category keywords
+    categories = {
+        "Politics": ["election", "government", "minister", "parliament", "political", "party", "bjp", "congress", "vote", "policy", "law", "supreme court", "president", "prime minister"],
+        "Business": ["business", "economy", "market", "stock", "company", "corporate", "trade", "finance", "bank", "rupee", "gdp", "industry", "startup", "investment"],
+        "Technology": ["technology", "tech", "ai", "artificial intelligence", "software", "app", "digital", "internet", "cyber", "smartphone", "computer", "innovation", "startup"],
+        "Health": ["health", "medical", "hospital", "doctor", "disease", "covid", "vaccine", "medicine", "patient", "treatment", "healthcare"],
+        "Environment": ["environment", "climate", "pollution", "green", "renewable", "carbon", "weather", "forest", "wildlife", "conservation"],
+        "Sports": ["cricket", "football", "sports", "match", "player", "team", "tournament", "olympics", "ipl", "fifa", "championship"],
+        "Entertainment": ["film", "movie", "actor", "actress", "bollywood", "music", "celebrity", "entertainment", "show", "series", "netflix"]
+    }
+    
+    # Count matches for each category
+    scores = {}
+    for category, keywords in categories.items():
+        score = sum(1 for keyword in keywords if keyword in text)
+        if score > 0:
+            scores[category] = score
+    
+    # Return category with highest score, or "General" if no matches
+    if scores:
+        return max(scores, key=scores.get)
+    return "General"
+
 async def fetch_feed(url: str, source_id: int):
     feed = feedparser.parse(url)
     async with async_session() as session:
-        for entry in feed.entries[:10]: # Limit to 10 for now
+        # Fetch more entries (up to 50) to get past week's news
+        for entry in feed.entries[:50]:
             try:
                 published_at = datetime.fromtimestamp(mktime(entry.published_parsed)) if hasattr(entry, "published_parsed") else datetime.utcnow()
+                
+                # Get summary and image
+                summary = entry.summary if hasattr(entry, "summary") else ""
+                image_url = None
+                
+                # Try to extract image from media content or enclosures
+                if hasattr(entry, "media_content") and entry.media_content:
+                    image_url = entry.media_content[0].get("url")
+                elif hasattr(entry, "enclosures") and entry.enclosures:
+                    for enclosure in entry.enclosures:
+                        if "image" in enclosure.get("type", ""):
+                            image_url = enclosure.get("href")
+                            break
+                
+                # Categorize the article
+                category = categorize_article(entry.title, summary)
+                
                 article = ArticleCreate(
                     title=entry.title,
-                    summary=entry.summary if hasattr(entry, "summary") else None,
+                    summary=summary,
                     url=entry.link,
                     published_at=published_at,
                     source_id=source_id,
-                    category="General" # Basic categorization
+                    category=category,
+                    image_url=image_url
                 )
-                # Check if exists logic should be here or in CRUD (CRUD creates blindly currently, but unique constraint on URL handles it)
+                
                 try:
                     await create_article(session, article)
-                    print(f"Saved: {entry.title}")
+                    print(f"Saved [{category}]: {entry.title}")
                 except Exception as e:
-                    print(f"Skipping duplicate or error: {entry.title} - {e}")
+                    # Skip duplicates silently
                     await session.rollback()
             except Exception as e:
                 print(f"Error processing entry: {e}")
