@@ -6,81 +6,127 @@ import os
 sys.path.append('/app')
 
 from app.db.session import async_session
-from app.crud import create_source, create_article
-from app.schemas import SourceCreate, ArticleCreate
-from datetime import datetime
+from app.crud import create_source
+from app.schemas import SourceCreate
 
 async def seed_data():
     print("Seeding data...")
     async with async_session() as session:
-        # Create Sources
+        # Create Sources with category-specific feeds
         sources_data = [
+            # General News
             {
                 "name": "The Hindu",
-                "url": "https://www.thehindu.com/",
+                "url": "https://www.thehindu.com",
                 "feed_url": "https://www.thehindu.com/news/national/feeder/default.rss",
-                "bias_rating": -2,
-                "reliability_rating": 9
+                "bias_rating": -2.5,
+                "reliability_score": 85.0
             },
             {
                 "name": "NDTV",
-                "url": "https://www.ndtv.com/",
+                "url": "https://www.ndtv.com",
                 "feed_url": "https://feeds.feedburner.com/ndtvnews-top-stories",
-                "bias_rating": -3,
-                "reliability_rating": 8
+                "bias_rating": -1.5,
+                "reliability_score": 80.0
             },
             {
                 "name": "Indian Express",
-                "url": "https://indianexpress.com/",
-                "feed_url": "https://indianexpress.com/section/india/feed/",
-                "bias_rating": -1,
-                "reliability_rating": 9
+                "url": "https://indianexpress.com",
+                "feed_url": "https://indianexpress.com/feed/",
+                "bias_rating": -1.0,
+                "reliability_score": 82.0
             },
             {
                 "name": "Times of India",
-                "url": "https://timesofindia.indiatimes.com/",
+                "url": "https://timesofindia.indiatimes.com",
                 "feed_url": "https://timesofindia.indiatimes.com/rssfeedstopstories.cms",
-                "bias_rating": 1,
-                "reliability_rating": 7
+                "bias_rating": 1.0,
+                "reliability_score": 75.0
             },
             {
                 "name": "Hindustan Times",
-                "url": "https://www.hindustantimes.com/",
+                "url": "https://www.hindustantimes.com",
                 "feed_url": "https://www.hindustantimes.com/feeds/rss/india-news/rssfeed.xml",
-                "bias_rating": 0,
-                "reliability_rating": 8
+                "bias_rating": 0.5,
+                "reliability_score": 78.0
             },
             {
                 "name": "India Today",
-                "url": "https://www.indiatoday.in/",
-                "feed_url": "https://www.indiatoday.in/rss/1206584",
-                "bias_rating": -1,
-                "reliability_rating": 8
+                "url": "https://www.indiatoday.in",
+                "feed_url": "https://www.indiatoday.in/rss/home",
+                "bias_rating": 0.0,
+                "reliability_score": 77.0
             },
             {
                 "name": "News18",
-                "url": "https://www.news18.com/",
-                "feed_url": "https://www.news18.com/common-feeds/v1/eng/news18/india.xml",
-                "bias_rating": 2,
-                "reliability_rating": 6
+                "url": "https://www.news18.com",
+                "feed_url": "https://www.news18.com/rss/india.xml",
+                "bias_rating": 2.0,
+                "reliability_score": 72.0
             },
             {
                 "name": "Zee News",
-                "url": "https://zeenews.india.com/",
+                "url": "https://zeenews.india.com",
                 "feed_url": "https://zeenews.india.com/rss/india-national-news.xml",
-                "bias_rating": 3,
-                "reliability_rating": 5
+                "bias_rating": 3.5,
+                "reliability_score": 70.0
+            },
+            # Sports-specific feeds
+            {
+                "name": "The Hindu - Sports",
+                "url": "https://www.thehindu.com/sport",
+                "feed_url": "https://www.thehindu.com/sport/feeder/default.rss",
+                "bias_rating": 0.0,
+                "reliability_score": 85.0
+            },
+            {
+                "name": "NDTV Sports",
+                "url": "https://sports.ndtv.com",
+                "feed_url": "https://feeds.feedburner.com/ndtvsports-latest",
+                "bias_rating": 0.0,
+                "reliability_score": 80.0
+            },
+            {
+                "name": "Times of India - Sports",
+                "url": "https://timesofindia.indiatimes.com/sports",
+                "feed_url": "https://timesofindia.indiatimes.com/rssfeeds/4719148.cms",
+                "bias_rating": 0.0,
+                "reliability_score": 75.0
+            },
+            {
+                "name": "India Today - Sports",
+                "url": "https://www.indiatoday.in/sports",
+                "feed_url": "https://www.indiatoday.in/rss/1206578",
+                "bias_rating": 0.0,
+                "reliability_score": 77.0
+            },
+            # Business/Economy feeds
+            {
+                "name": "Moneycontrol",
+                "url": "https://www.moneycontrol.com",
+                "feed_url": "https://www.moneycontrol.com/rss/latestnews.xml",
+                "bias_rating": 0.5,
+                "reliability_score": 80.0
+            },
+            {
+                "name": "Economic Times",
+                "url": "https://economictimes.indiatimes.com",
+                "feed_url": "https://economictimes.indiatimes.com/rssfeedstopstories.cms",
+                "bias_rating": 1.5,
+                "reliability_score": 82.0
+            },
+            # Entertainment
+            {
+                "name": "Times of India - Entertainment",
+                "url": "https://timesofindia.indiatimes.com/entertainment",
+                "feed_url": "https://timesofindia.indiatimes.com/rssfeeds/1081479906.cms",
+                "bias_rating": 0.0,
+                "reliability_score": 70.0
             }
         ]
 
         for s in sources_data:
             try:
-                # Check if source exists by name to avoid duplicates if re-running
-                # Ideally we should have a get_source_by_name or similar, but for seeding we can try create and catch
-                # Or better, let's just try to create and ignore if it fails (likely due to unique constraint if we had one, but we don't on name yet?)
-                # SourceBase has name: str = Field(index=True). Not unique. 
-                # But let's assume we want to avoid duplicates.
-                # For now, we'll just try to create.
                 await create_source(session, SourceCreate(**s))
                 print(f"Created source: {s['name']}")
             except Exception as e:
