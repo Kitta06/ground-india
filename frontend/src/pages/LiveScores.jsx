@@ -2,7 +2,7 @@ import { Trophy, ExternalLink, Clock, Tv, RefreshCw } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import { useQuery } from 'react-query'
 import axios from 'axios'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 
 // Fetch live scores from backend API
 const fetchLiveScores = async () => {
@@ -22,115 +22,12 @@ const fetchLiveScores = async () => {
         return data
     }
 }
-venue: 'Wankhede Stadium, Mumbai',
-    detailsUrl: 'https://www.espncricinfo.com',
-        isLive: true
-    },
-{
-    id: 2,
-        sport: 'Football',
-            league: 'Premier League',
-                status: 'LIVE',
-                    team1: {
-        name: 'Manchester United',
-            short: 'MUN',
-                score: '2'
-    },
-    team2: {
-        name: 'Liverpool',
-            short: 'LIV',
-                score: '1'
-    },
-    time: "67'",
-        venue: 'Old Trafford',
-            detailsUrl: 'https://www.premierleague.com',
-                isLive: true
-},
-{
-    id: 3,
-        sport: 'Cricket',
-            league: 'Test Match',
-                status: 'Day 2',
-                    team1: {
-        name: 'India',
-            short: 'IND',
-                score: '345 & 89/2',
-                    overs: '25.0'
-    },
-    team2: {
-        name: 'Australia',
-            short: 'AUS',
-                score: '287'
-    },
-    venue: 'MCG, Melbourne',
-        detailsUrl: 'https://www.espncricinfo.com',
-            isLive: false
-},
-{
-    id: 4,
-        sport: 'Football',
-            league: 'La Liga',
-                status: 'HT',
-                    team1: {
-        name: 'Real Madrid',
-            short: 'RMA',
-                score: '1'
-    },
-    team2: {
-        name: 'Barcelona',
-            short: 'BAR',
-                score: '0'
-    },
-    venue: 'Santiago Bernabéu',
-        detailsUrl: 'https://www.laliga.com',
-            isLive: false
-},
-{
-    id: 5,
-        sport: 'Tennis',
-            league: 'Australian Open',
-                status: 'LIVE',
-                    team1: {
-        name: 'Novak Djokovic',
-            short: 'DJO',
-                score: '6-4, 3-2'
-    },
-    team2: {
-        name: 'Carlos Alcaraz',
-            short: 'ALC',
-                score: '4-6, 2-3'
-    },
-    venue: 'Rod Laver Arena',
-        detailsUrl: 'https://ausopen.com',
-            isLive: true
-},
-{
-    id: 6,
-        sport: 'Basketball',
-            league: 'NBA',
-                status: 'Q3',
-                    team1: {
-        name: 'LA Lakers',
-            short: 'LAL',
-                score: '78'
-    },
-    team2: {
-        name: 'Golden State Warriors',
-            short: 'GSW',
-                score: '82'
-    },
-    time: '5:23',
-        venue: 'Crypto.com Arena',
-            detailsUrl: 'https://www.nba.com',
-                isLive: true
-}
-];
 
 function ScoreCard({ match }) {
     return (
         <div className={`group relative bg-white dark:bg-[#1a1a1a] border-2 rounded-xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${match.isLive
-            ? 'border-red-500 dark:border-red-500'
-            : 'border-gray-200 dark:border-[#404040]'
+                ? 'border-red-500 dark:border-red-500'
+                : 'border-gray-200 dark:border-[#404040]'
             }`}>
             {/* Live Indicator */}
             {match.isLive && (
@@ -151,8 +48,8 @@ function ScoreCard({ match }) {
                         <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{match.league}</p>
                     </div>
                     <span className={`px-3 py-1 rounded-full text-xs font-semibold ${match.isLive
-                        ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400'
-                        : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'
+                            ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400'
+                            : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'
                         }`}>
                         {match.status}
                     </span>
